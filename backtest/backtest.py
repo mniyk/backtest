@@ -48,10 +48,15 @@ class Backtest:
         self.settlements = []
         self.result_df = None
 
+        self.time_index = 0
+        self.close_index = df.columns.get_loc(self.close_column)
+        self.high_index = df.columns.get_loc(self.high_column)
+        self.low_index = df.columns.get_loc(self.low_column)
+
     def backtest(self, func, **kwargs):
         """バックテスト
         """
-        for _, data in self.df.iterrows():
+        for data in self.df.values:
             self.order_settlement(data)
 
             if kwargs['kwargs']:
@@ -67,19 +72,19 @@ class Backtest:
             self.result_df = self.join_dfs(
                 [self.result_df, pd.DataFrame.from_dict(self.settlements)])
 
-    def send_order(self, data: Series, direction: int):
+    def send_order(self, data, direction: int):
         """発注
 
         Args:
             data (Series): ローソク足データ
             direction (int): 売買方向
         """
-        close_price = data[self.close_column]
+        close_price = data[self.close_index]
         profit_pip = self.profit * self.pip
         loss_pip = self.loss * self.pip
 
         result = {
-            'order_time': data['time'],
+            'order_time': data[self.time_index],
             'order_price': close_price,
             'direction': direction,
             'profit_price': None,
@@ -107,8 +112,8 @@ class Backtest:
         Args:
             data (Series): ローソク足データ
         """
-        high_price = data[self.high_column]
-        low_price = data[self.low_column]
+        high_price = data[self.high_index]
+        low_price = data[self.low_index]
 
         for key in self.orders:
             pops = []
@@ -136,7 +141,8 @@ class Backtest:
                             result = 1
                 
                 if result != 0:
-                    self.orders[key][i]['settlement_time'] = data['time']
+                    self.orders[
+                        key][i]['settlement_time'] = data[self.time_index]
                     self.orders[key][i]['settlement_price'] = settlement_price
                     self.orders[key][i]['result'] = result
 

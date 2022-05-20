@@ -35,10 +35,10 @@ class TestOanda(unittest.TestCase):
     def backtest_direction(data):
         direction = None
 
-        if data['macd_12_26_shift_diff'] > 0:
+        if data[10] > 0:
             direction = 1
 
-        if data['macd_12_26_shift_diff'] < 0:
+        if data[10] < 0:
             direction = -1
 
         return direction
