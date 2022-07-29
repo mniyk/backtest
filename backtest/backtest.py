@@ -53,18 +53,23 @@ class Backtest:
         self.high_index = df.columns.get_loc(self.high_column)
         self.low_index = df.columns.get_loc(self.low_column)
 
-    def backtest(self, func, **kwargs):
+    def backtest(self, func, reverse_order=False, **kwargs):
         """バックテスト
         """
+        columns = self.df.columns
+
         for data in self.df.values:
             self.order_settlement(data)
 
-            if kwargs['kwargs']:
-                direction = func(data, **kwargs['kwargs'])
+            if kwargs:
+                direction = func(data, columns, **kwargs)
             else:
-                direction = func(data)
+                direction = func(data, columns)
 
             self.send_order(data, direction)
+
+            if reverse_order:
+                self.send_order(data, direction * -1)
 
         if self.result_df is None:
             self.result_df = pd.DataFrame.from_dict(self.settlements)

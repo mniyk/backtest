@@ -6,7 +6,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
 
 setuptools.setup(
     name='backtest',
-    version='0.2.0',
+    version='0.2.1',
     author='mniyk',
     author_email='my.name.is.yohei.kono@gmail.com',
     description='backtest python library',
